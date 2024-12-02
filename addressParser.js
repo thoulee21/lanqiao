@@ -1,7 +1,7 @@
-const text = "15277775555 重庆市渝中区解放碑步行街99号 刘十二";
+const text = "周八 15277775555 西湖7号，";
 
-// 将输入字符串按空格分割为多个部分
-const parts = text.split(' ');
+// 清理字符串末尾的标点符号，并按空格分割
+const parts = text.replace(/[，。、；,.;]$/, '').split(' ');
 
 // 匹配11位手机号
 const phoneRegex = /\b\d{11}\b/;
