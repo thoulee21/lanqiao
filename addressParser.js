@@ -9,7 +9,7 @@ function extractInfo(text) {
 
     let phone = '';
     let name = '';
-    let addressParts = [];
+    let address = '';
 
     // 遍历每个部分，分别识别电话号码、姓名和地址
     parts.forEach(part => {
@@ -18,12 +18,9 @@ function extractInfo(text) {
         } else if (nameRegex.test(part)) {
             name = part;
         } else if (addressRegex.test(part)) {
-            addressParts.push(part);
+            address = part;
         }
     });
-
-    // 将地址部分合并为一个完整的地址字符串，并去除逗号
-    let address = addressParts.join(' ').replace(/，/g, '').replace(/,/g, '');
 
     // 确保地址不包含姓名和电话
     if (address.includes(phone)) {
@@ -44,7 +41,7 @@ function extractInfo(text) {
 console.log(extractInfo("15277775555 重庆市渝中区解放碑步行街99号 刘十二"));
 console.log(extractInfo("周八 15277775555 西湖7号"));
 console.log(extractInfo("西湖7号 15012345678 周八"));
-console.log(extractInfo("周八 15277775555 西湖7号，"));
+console.log(extractInfo("周八 15277775555 西湖7号"));
 console.log(extractInfo("15012345678 北京市海淀区中关村大街1号 张三"));
 console.log(extractInfo("李四 13800138000 上海市浦东新区世纪大道100号"));
 console.log(extractInfo("深圳市南山区科技园 13512345678 王五"));
