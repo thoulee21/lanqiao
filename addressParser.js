@@ -32,7 +32,7 @@ function extractInfo(text) {
 
     return {
         name: name,
-        phone: Number(phone),
+        phone: phone,
         address: address
     };
 }
