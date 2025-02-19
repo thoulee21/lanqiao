@@ -68,8 +68,11 @@ class XSet extends Set {
     */
     static union(a, ...bSets) {
         // TODO：待补充代码 目标 3
-
-        return new XSet(); // 修改此处为函数的正确返回值 
+        const arrA = Array.from(a);
+        for (let b of bSets) {
+            arrA.push(...Array.from(b));
+        }
+        return new XSet(arrA); // 修改此处为函数的正确返回值
     }
 
 }
@@ -86,3 +89,7 @@ console.log(b.difference(a)); // XSet { 4 }
 console.debug('目标 2');
 console.log(XSet.intersection(a, b)); // XSet { 2, 3 }
 console.log(XSet.intersection(a, b, c)); // XSet { 3 }
+
+console.debug('目标 3');
+console.log(XSet.union(a, b)); // XSet { 1, 2, 3, 4 }
+console.log(XSet.union(a, b, c)); // XSet { 1, 2, 3, 4, 5 }
