@@ -58,7 +58,7 @@ function scanFiles(directoryPath, fileExtensionArr) {
 }
 
 // 单元测试代码
-const directoryPath = "./knowlagdePoints";
+const directoryPath = "./knowledgePoints";
 const fileExtensionArr = ["js", "css", "cpp", "java", "html"];
 const res = scanFiles(directoryPath, fileExtensionArr);
 console.log(res);
