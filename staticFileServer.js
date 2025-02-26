@@ -1,6 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
+/**
+ * 生成静态文件映射表
+ * @param {string} dir - 目录路径
+ * @returns {Object} URL路径到文件信息的映射
+ */
 function generateStaticFilesMap(dir) {
     // TODO：待补充代码  
     let fileMap = {}

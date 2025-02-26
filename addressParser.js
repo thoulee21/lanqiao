@@ -1,3 +1,8 @@
+/**
+ * 从文本中提取姓名、电话和地址信息
+ * @param {string} text - 包含个人信息的文本字符串 
+ * @returns {Object} 包含name,phone,address的对象
+ */
 function extractInfo(text) {
     // 定义正则表达式
     const phoneRegex = /\b\d{11}\b/; // 匹配11位数字

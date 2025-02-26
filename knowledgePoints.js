@@ -1,6 +1,10 @@
 import axios from 'axios';
 import { onMounted, reactive, ref } from 'vue';
 
+/**
+ * 知识点统计组件
+ * 统计试题库中各知识点的分布情况
+ */
 export default {
     setup() {
         const mockUrl = "./mock/question_bank.json";
@@ -33,6 +37,9 @@ export default {
 
         let chart;
 
+        /**
+         * 应用筛选条件并更新图表
+         */
         function applyFilter() {
             let data;
             // TODO 4 请在下面补充代码 
@@ -79,6 +86,11 @@ export default {
             // TODO 3 END
         }
 
+        /**
+         * 提取所有题目中的唯一知识点
+         * @param {Array} data - 题目数据
+         * @returns {Array} 知识点数组
+         */ 
         function extractUniquePoints(data) {
             // TODO 2 请在下面补充代码
             // HIGHLIGHT NOTE

@@ -1,3 +1,7 @@
+/**
+ * XSet 类继承自 Set,提供集合运算功能
+ * @extends Set
+ */
 class XSet extends Set {
     /**
      * 与一个或多个集合的并集
@@ -27,26 +31,25 @@ class XSet extends Set {
     }
 
     /**
-    * 返回两个集合的差集 a-b
-    * @param a 类型为 XSet 的集合
-    * @param b 类型为 XSet 的集合
-    * @returns {XSet} 返回差集集合，类型为 XSet
-    */
+     * 返回两个集合的差集 a-b (在a中但不在b中的元素)
+     * @param {XSet} a - 第一个集合
+     * @param {XSet} b - 第二个集合 
+     * @returns {XSet} 差集
+     */
     static difference(a, b) {
-        // TODO：待补充代码 目标 1
         const arrA = Array.from(a);
         const diff = arrA.filter((item) => !b.has(item));
 
         return new XSet(diff); // 修改此处为函数的正确返回值 
     }
+
     /**
-     * 返回两个或多个集合的交集
-     * @param a 类型为 XSet 的集合
-     * @param bSets 元素类型为 XSet 的数组
-     * @returns {XSet} 返回交集集合，类型为 XSet
+     * 返回多个集合的交集 (所有集合中都存在的元素)
+     * @param {XSet} a - 第一个集合
+     * @param {...XSet} bSets - 其他集合
+     * @returns {XSet} 交集
      */
     static intersection(a, ...bSets) {
-        // TODO：待补充代码 目标 2
         const arrA = Array.from(a);
         const inter = arrA.filter((item) => {
             for (let b of bSets) {
@@ -61,13 +64,12 @@ class XSet extends Set {
     }
 
     /**
-    * 返回两个或多个集合的并集
-    * @param a 类型为 XSet 的集合
-    * @param bSets 元素类型为 XSet 的数组
-    * @returns {XSet} 返回并集集合，类型为 XSet
-    */
+     * 返回多个集合的并集 (至少存在于一个集合中的元素)
+     * @param {XSet} a - 第一个集合  
+     * @param {...XSet} bSets - 其他集合
+     * @returns {XSet} 并集
+     */
     static union(a, ...bSets) {
-        // TODO：待补充代码 目标 3
         const arrA = Array.from(a);
         for (let b of bSets) {
             arrA.push(...Array.from(b));

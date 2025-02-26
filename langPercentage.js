@@ -2,13 +2,12 @@ const fs = require("fs");
 const path = require("path");
 
 /**
- * 扫描指定目录，计算不同文件类型的占比
- * @param {string} directoryPath 目录路径
- * @param {Array} fileExtensionArr 需要考虑的文件后缀列表
- * @returns 包含每个单独元素的 filename、percentage 的数组列表
+ * 扫描文件目录统计不同类型文件占比
+ * @param {string} directoryPath - 目录路径
+ * @param {string[]} fileExtensionArr - 文件扩展名数组
+ * @returns {Array<{filename: string, percentage: string}>} 文件类型占比
  */
 function scanFiles(directoryPath, fileExtensionArr) {
-    //TODO：待补充代码
     if (!fs.existsSync(directoryPath)) {
         return `目录路径 ${directoryPath} 不存在`;
     }

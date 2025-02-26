@@ -1,3 +1,8 @@
+/**
+ * Promise.allSettled的简单实现
+ * @param {Promise[]} promises - Promise数组
+ * @returns {Promise} 包含所有Promise结果的Promise
+ */
 function myAllSettled(promises) {
   return new Promise(function (resolve, reject) {
     let res = [];

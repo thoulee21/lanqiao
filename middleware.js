@@ -1,3 +1,8 @@
+/**
+ * 组合多个中间件函数
+ * @param {...Function} middlewares - 中间件函数列表
+ * @returns {Function} 组合后的函数
+ */
 function compose(...middlewares) {
     return function(initialValue, callback) {
         function dispatch(index, value) {

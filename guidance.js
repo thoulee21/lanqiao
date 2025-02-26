@@ -1,3 +1,8 @@
+/**
+ * 新手引导组件 
+ * 通过配置文件控制引导步骤和内容
+ */
+
 const xhr = new XMLHttpRequest()
 xhr.overrideMimeType("application/json");
 xhr.open('GET', 'config.json', true);
@@ -35,7 +40,10 @@ var target, boundingClientRect, clone
 //引导弹窗与目标元素的距离
 const distance = 16
 
-//获取到引导组件的配置信息后开始引导
+/**
+ * 初始化引导组件
+ * @param {Array} config - 引导步骤配置数组
+ */
 function init(config = []) {
   if (!config[curIndex]) return
   document.body.insertAdjacentHTML('afterbegin', introduceDomFragment)
@@ -45,8 +53,8 @@ function init(config = []) {
   introduce = document.querySelector('.introduce-box')
   introduceTitle = document.querySelector('.introduce-title')
   introduceDesc = document.querySelector('.introduce-desc')
-  setIntorduceInfo(config)
-  setIntorducePosition(config)
+  setIntroduceInfo(config)
+  setIntroducePosition(config)
 
   exit.onclick = function (e) {
     e.stopPropagation()
@@ -61,8 +69,8 @@ function init(config = []) {
         next.innerText = '完成'
       }
       curIndex++
-      setIntorduceInfo(config)
-      setIntorducePosition(config)
+      setIntroduceInfo(config)
+      setIntroducePosition(config)
     } else {
       document.body.removeChild(comp)
       removeTarget()
@@ -72,14 +80,17 @@ function init(config = []) {
 }
 
 // 设置引导内容
-function setIntorduceInfo(config) {
+function setIntroduceInfo(config) {
   if (!introduceTitle || !introduceDesc) return
   introduceTitle.innerText = config[curIndex].title
   introduceDesc.innerHTML = config[curIndex].content
 }
 
-// 设置引导位置
-function setIntorducePosition(config) {
+/**
+ * 设置引导组件位置
+ * @param {Array} config - 引导配置
+ */
+function setIntroducePosition(config) {
   removeTarget() // 移除上一次复制的元素 
   // 定义当前 target 元素
   target = document.querySelector(config[curIndex].target);
@@ -121,7 +132,9 @@ function setIntorducePosition(config) {
   }
 }
 
-// 复制元素
+/**
+ * 复制目标元素
+ */
 function copyTarget() {
   //  TODO：待补充代码
   // 克隆 DOM 节点
