@@ -63,10 +63,31 @@ const teacher = {
   
       // 完成编辑函数
       const success = (index) => {
-        store.studentData.push(students.value[index]);
-        // 禁用输入框
+        const studentData = students.value[index];
+        
+        // 检查当前学生是否已存在于store中
+        const existingIndex = store.studentData.findIndex(item => item.master === studentData.master);
+        
+        if (existingIndex !== -1) {
+          // 如果学生已存在，更新成绩
+          store.studentData[existingIndex].chinese = studentData.chinese;
+          store.studentData[existingIndex].math = studentData.math;
+          store.studentData[existingIndex].english = studentData.english;
+        } else {
+          // 如果学生不存在，添加到store中
+          // 创建一个新对象，只包含需要的属性
+          const newStudentData = {
+            id: studentData.id,
+            master: studentData.master,
+            chinese: studentData.chinese,
+            math: studentData.math,
+            english: studentData.english
+          };
+          store.studentData.push(newStudentData);
+        }
+        
+        // 禁用编辑模式
         students.value[index].isEditing = false;
-        console.log(store.studentData);
       };
   
       // 注销函数
@@ -109,4 +130,3 @@ const teacher = {
       };
     },
   };
-  
