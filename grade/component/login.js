@@ -8,8 +8,8 @@ const login = {
                   <form>
                       <div id="user-info">
                           <!-- 需要补充代码 -->
-                          <input type="text" placeholder="请输入账号" id="amount" name="amount" autocomplete>
-                          <input type="password" placeholder="请输入密码" id="password" name="password" autocomplete>
+                          <input type="text" placeholder="请输入账号" id="amount" name="amount" autocomplete v-model="amount">
+                          <input type="password" placeholder="请输入密码" id="password" name="password" autocomplete v-model="password">
                       </div>
                       <div id="btn">
                           <!-- 需要补充代码 -->
