@@ -56,6 +56,10 @@ const student = {
     const english = ref("");
 
     onMounted(() => {
+      // 注意缓存问题，/teacher 页面不会随/student 页面刷新而更新数据
+      // 蓝桥官方题解是用computed来处理的
+
+
       // 获取当前登录的学生信息
       const loggedStu = JSON.parse(localStorage.getItem("user"));
       stuIdTxt.value = loggedStu.master;
