@@ -64,6 +64,14 @@ window.onload = async () => {
       });
     } else {
       for (const child of prevChildren) {
+        // 不对未匹配到的子节点进行处理
+        // 数据可信，路径的层级结构是正确的（先出现父节点，后出现子节点）
+        // 父节点先被处理，子节点后被处理
+        // 例：
+        // > components/
+        // > components/dialogs/
+        // > components/dialogs/components/
+        // > components/dialogs/components/base
         if (child.name === dirs[0]) {
           dirs.shift();
           enter(child.children, dirs, value);
