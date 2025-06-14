@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>会议日程</title>
+    <link rel="stylesheet" href="./css/index.css" />
+    <link rel="stylesheet" href="./css/common.css" />
+    <link rel="stylesheet" href="./css/theme.css" />
+    <link rel="stylesheet" href="./element-plus/index.css" />
+    <script src="./lib/vue@next.js"></script>
+    <script src="./js/utils.js"></script>
+  </head>
+  <body>
+    <div id="app" v-cloak>
+      <div class="page">
+        <main>
+          <div flex-between style="margin-bottom: 10px">
+            <div flex-center>
+              <h2 style="margin-left: 6px; margin-right: 12px">会议日程</h2>
+            </div>
+
+            <div flex-center>
+              <button id="add" @click="onEdit('')">创建日程</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="search">
+              <input
+                search
+                type="text"
+                placeholder="请输入关键字"
+                v-model="keywords"
+                @keyup.enter.native="fetchData"
+              />
+            </div>
+
+            <div class="operates" v-show="!isManage">
+              <span class="btn-manage" @click="isManage = true; activeId = ''"
+                >批量管理</span
+              >
+            </div>
+
+            <div class="operates" v-show="isManage">
+              <p class="btn-cancle" @click="handleCancleManage">取消</p>
+              <p class="line"></p>
+              <label
+                for="allcheck"
+                class="btn-all-select"
+                v-show="isManage"
+                @click="handleSelectAll"
+                >全选
+                <input
+                  id="allcheck"
+                  type="checkbox"
+                  :checked="allCheckStatus"
+                />
+              </label>
+              <span class="btn-all-delete" @click="handleDeleteBatch"
+                >批量删除</span
+              >
+            </div>
+            <!-- 这个是渲染日期列表 -->
+            <div class="item" v-for="item,index in list" :key="item">
+              <p class="item-date">
+                <input
+                  class="date-checkbox"
+                  type="checkbox"
+                  v-show="isManage"
+                  :checked="item.checked"
+                  @click="handleSelectDate(item)"
+                />
+                <span>{{ formatDate(item.date) }}</span> {{ dateText(item.date)
+                }}
+              </p>
+              <!-- 这个是渲染期列表下面的会议列表的 -->
+              <div
+                class="record"
+                v-for="record in item.meetings"
+                :key="record.id"
+                :data-id="record.id"
+              >
+                <input
+                  class="meeting-checkbox"
+                  type="checkbox"
+                  v-show="isManage"
+                  :checked="record.checked"
+                  @click="handleSelect(record)"
+                />
+                <div class="record-body">
+                  <p>
+                    {{ record.startTime }}开始&nbsp;｜&nbsp;{{ record.duration +
+                    'min' }}&nbsp;<span v-show="record.password">｜</span
+                    >&nbsp;{{ record.password }}
+                  </p>
+                  <p>{{ record.title }}</p>
+                </div>
+                <div class="item-operations" v-show="!isManage">
+                  <button class="edit" @click="onEdit(record)">编辑</button>
+                  <button class="delete" @click="handleDeleteOne(record)">
+                    删除
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+      <!-- 表单区域 -->
+      <el-drawer
+        v-model="showEdit"
+        :title="form.id?'编辑日程':'创建日程'"
+        :close-on-click-modal="false"
+        @close="beforeClose"
+      >
+        <template #default>
+          <div>
+            <el-form
+              ref="ruleFormRef"
+              :model="form"
+              :rules="rules"
+              status-icon
+              label-width="60px"
+              label-position="left"
+            >
+              <!-- ① 会议主题 -->
+              <el-form-item label="主题" prop="title">
+                <el-input
+                  placeholder="请输入会议主题"
+                  clearable
+                  v-model="form.title"
+                />
+              </el-form-item>
+              <!-- ② 日期 -->
+              <div style="display: flex; align-items: center">
+                <el-form-item label="开始" prop="startDate">
+                  <el-date-picker
+                    size
+                    style="width: 150px"
+                    v-model="form.startDate"
+                    type="date"
+                    placeholder="Please pick"
+                    :size="size"
+                  ></el-date-picker>
+                </el-form-item>
+                <!--  开始时间 -->
+                <el-form-item prop="startTime" label-width="0">
+                  <el-select
+                    style="width: 114px"
+                    v-model="form.startTime"
+                    placeholder="Please select"
+                  >
+                    <el-option
+                      v-for="item in timeOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
+              <!--  时长 -->
+              <el-form-item label="时长" prop="duration">
+                <el-select v-model="form.duration" placeholder="Please select">
+                  <el-option
+                    v-for="item in durationOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <!-- 录制 -->
+              <el-form-item label="录制" prop="isTranscribe">
+                <el-checkbox v-model="form.isTranscribe" label="自动云录制" />
+              </el-form-item>
+              <!-- 密码 -->
+              <el-form-item label="密码" prop="password">
+                <el-input
+                  v-model="form.password"
+                  type="password"
+                  minlength="4"
+                  maxlength="6"
+                  placeholder="请输入4-6位数字密码"
+                  show-password
+                />
+              </el-form-item>
+            </el-form>
+          </div>
+        </template>
+        <template #footer>
+          <button id="save" @click="handleSave(ruleFormRef)">预定</button>
+        </template>
+      </el-drawer>
+    </div>
+
+    <script src="./element-plus/index.full.js"></script>
+    <script src="./lib/axios.min.js"></script>
+    <script src="./lib/axios-mock-adapter.min.js"></script>
+    <script src="./js/mock.js"></script>
+
+    <script>
+      const { ref, onMounted, reactive, toRefs, watch, computed } = Vue;
+
+      const app = Vue.createApp({
+        setup() {
+          const state = reactive({
+            keywords: "", //搜索关键词
+            isManage: false, //批量管理
+          });
+          const editState = reactive({
+            timeOptions: getTimeOptions(),
+            durationOptions: durationOptions,
+            repeatOptions: repeatOptions,
+            form: {
+              id: "",
+              title: "",
+              startDate: "2024/06/01",
+              startTime: "",
+              duration: "",
+              isTranscribe: "",
+              password: "",
+            },
+            rules: {
+              title: [
+                { required: true, message: "请输入主题", trigger: "blur" },
+              ],
+              startDate: [
+                {
+                  required: true,
+                  message: "请选择开始日期",
+                  trigger: "change",
+                },
+              ],
+              startTime: [
+                {
+                  required: true,
+                  message: "请选择开始时间",
+                  trigger: "change",
+                },
+              ],
+              duration: [
+                { required: true, message: "请输入时长", trigger: "change" },
+              ],
+            },
+          });
+          const showEdit = ref(false);
+          let allCheckStatus = ref(false);
+
+          // 创建日程
+          const handleSave = async (formEl) => {
+            if (!formEl) return;
+            await formEl.validate(async (valid, fields) => {
+              if (valid) {
+                const params = editState.form;
+                if (!params.id) {
+                  // TODO：待补充代码  目标 1
+
+                  const response = await axios.post("/api/meetings", params);
+
+                  // TODO：END
+                  await fetchData();
+                  showEdit.value = false;
+                } else {
+                  // 编辑日程
+                  await axios.put("/api/modify", params);
+                  await fetchData();
+                  showEdit.value = false;
+                }
+              } else {
+                console.log("error submit!", fields);
+              }
+            });
+          };
+
+          // 删除单个会议日程
+          const handleDeleteOne = async (record) => {
+            // TODO：待补充代码  目标 2
+            const id = record.id;
+            await axios.delete(`/api/delmeeting/${id}`);
+            // TODO：END
+            fetchData();
+          };
+
+          // 点击单个会议日程
+          const handleSelect = (record) => {
+            // TODO：待补充代码  目标 3 和 4
+            const dateIndex = list.value.findIndex((value) => {
+              return value.date === record.startDate;
+            });
+            const eventIndex = list.value[dateIndex].meetings.findIndex(
+              (meeting) => {
+                return meeting.id === record.id;
+              }
+            );
+            const prevChecked =
+              list.value[dateIndex].meetings[eventIndex].checked;
+            list.value[dateIndex].meetings[eventIndex].checked = !prevChecked;
+            const checklist = list.value[dateIndex].meetings.map((meeting) => {
+              if (meeting.checked) {
+                return 1;
+              } else {
+                return 0;
+              }
+            });
+            const checkSum = checklist.reduce((prev, cur) => prev + cur, 0);
+            if (checkSum === checklist.length) {
+              list.value[dateIndex].checked = true;
+            } else {
+              list.value[dateIndex].checked = false;
+            }
+
+            const allChecklist = list.value
+              .map((d) => Array.from(d.meetings))
+              .flat()
+              .map((m) => {
+                if (m.checked) {
+                  return 1;
+                } else {
+                  return 0;
+                }
+              });
+            const allCheckSum = allChecklist.reduce(
+              (prev, cur) => prev + cur,
+              0
+            );
+            if (allCheckSum === allChecklist.length) {
+              allCheckStatus.value = true;
+            } else {
+              allCheckStatus.value = false;
+            }
+            // TODO：END
+          };
+
+          // 点击日期多选框
+          const handleSelectDate = (item) => {
+            // TODO：待补充代码  目标 3 和 4
+            const dateIndex = list.value.findIndex((value) => {
+              return item.date === value.date;
+            });
+            list.value[dateIndex].checked = !list.value[dateIndex].checked;
+            const newChecked = list.value[dateIndex].checked;
+            const newMeetings = list.value[dateIndex].meetings.map((item) => {
+              return {
+                ...item,
+                checked: newChecked,
+              };
+            });
+            list.value[dateIndex].meetings = newMeetings;
+
+            const allChecklistDate = list.value
+              .map((d) => Array.from(d.meetings))
+              .flat()
+              .map((m) => {
+                if (m.checked) {
+                  return 1;
+                } else {
+                  return 0;
+                }
+              });
+            const allCheckSumDate = allChecklistDate.reduce(
+              (prev, cur) => prev + cur,
+              0
+            );
+            if (allCheckSumDate === allChecklistDate.length) {
+              allCheckStatus.value = true;
+            } else {
+              allCheckStatus.value = false;
+            }
+            // TODO：END
+          };
+
+          // 点击全选选择框
+          const handleSelectAll = () => {
+            // TODO：待补充代码  目标 4
+            allCheckStatus.value = !allCheckStatus.value;
+
+            // array.map *不改变原有数据*，数组中的每一项作为参数喂给map(callback)
+            // 多次callback函数的返回值构成的数组作为充当array.map的返回值
+            
+            // array.forEach 改变原有数据，对数组里的每一项执行动作
+            
+            list.value.forEach((item) => {
+              item.meetings.forEach((m) => (m.checked = allCheckStatus.value));
+              item.checked = allCheckStatus.value;
+            });
+            // TODO：END
+          };
+          
+          let deleteIds = computed(() => {
+            let arr = [];
+            for (let index = 0; index < list.value.length; index++) {
+              const meets = list.value[index].meetings;
+              for (let j = 0; j < meets.length; j++) {
+                if (meets[j].checked) {
+                  arr.push(meets[j].id);
+                }
+              }
+            }
+            return arr.join();
+          });
+
+          // 批量删除按钮
+          const handleDeleteBatch = async () => {
+            await axios.delete(`/api/delmeeting/${deleteIds.value}`);
+            fetchData();
+          };
+
+          const onEdit = (meeting) => {
+            //编辑日程
+            if (meeting) {
+              editState.form = JSON.parse(JSON.stringify(meeting));
+            } else {
+              editState.form.id = "";
+            }
+            showEdit.value = true;
+            beforeClose();
+          };
+          //会议记录列表
+          const list = ref([]);
+
+          // 搜索日程-获取会议日程列表
+          const fetchData = async () => {
+            let res = await axios.get(
+              `/meetings/list?keywords=${state.keywords}`
+            );
+            list.value = res.data;
+            list.value = list.value.map((item) => {
+              item.checked = false;
+              return item;
+            });
+          };
+          fetchData();
+
+          //取消管理
+          const handleCancleManage = () => {
+            state.isManage = false;
+          };
+
+          const ruleFormRef = ref(null);
+          //关闭编辑弹窗时清空表单
+          const beforeClose = () => {
+            ruleFormRef.value && ruleFormRef.value.resetFields();
+          };
+
+          return {
+            ...toRefs(state),
+            fetchData,
+            list,
+            showEdit,
+            onEdit,
+            handleCancleManage,
+            handleDeleteBatch,
+            handleSelect,
+            handleSelectDate,
+            handleSelectAll,
+            ...toRefs(editState),
+            ruleFormRef,
+            beforeClose,
+            handleSave,
+            formatDate,
+            dateText,
+            handleDeleteOne,
+            allCheckStatus,
+          };
+        },
+      });
+
+      app.use(ElementPlus).mount("#app");
+    </script>
+  </body>
+</html>
